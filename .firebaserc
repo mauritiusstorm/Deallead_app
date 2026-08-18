@@ -1,7 +1,5 @@
 {
   "projects": {
-    "development": "deallead-dev",
-    "production": "deallead-prod",
-    "default": "deallead-dev"
+    "default": "deallead-771fe"
   }
 }
