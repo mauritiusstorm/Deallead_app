@@ -55,7 +55,7 @@ export default function SignUpPage() {
           {t('auth.signUp')}
         </Button>
       </form>
-      <p className="text-center text-sm text-white/50">
+      <p className="text-center text-sm text-black/50">
         <Link to="/sign-in" className="underline">
           {t('auth.signIn')}
         </Link>

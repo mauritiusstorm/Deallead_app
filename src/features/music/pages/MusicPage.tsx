@@ -77,18 +77,18 @@ export default function MusicPage() {
               <Link
                 key={album.id}
                 to={`/albums/${album.id}`}
-                className="flex items-center gap-3 rounded-md p-2 hover:bg-white/5"
+                className="flex items-center gap-3 rounded-md p-2 hover:bg-black/5"
               >
-                <div className="size-14 shrink-0 overflow-hidden rounded bg-white/10">
+                <div className="size-14 shrink-0 overflow-hidden rounded bg-black/10">
                   {album.artworkUrl && <img src={album.artworkUrl} alt="" className="size-full object-cover" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{album.title}</p>
-                  <p className="truncate text-xs text-white/50">
+                  <p className="truncate text-xs text-black/50">
                     {timestampToYear(album.releaseDate)} · {album.trackCount} titres
                   </p>
                 </div>
-                <ChevronRightIcon className="size-4 shrink-0 text-white/30" />
+                <ChevronRightIcon className="size-4 shrink-0 text-black/30" />
               </Link>
             ))}
           </div>
@@ -103,9 +103,9 @@ export default function MusicPage() {
               <button
                 key={track.id}
                 onClick={() => void playTrackList(singles, artist.name, i)}
-                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-black/5"
               >
-                <div className="size-11 shrink-0 overflow-hidden rounded bg-white/10">
+                <div className="size-11 shrink-0 overflow-hidden rounded bg-black/10">
                   {track.artworkUrl && <img src={track.artworkUrl} alt="" className="size-full object-cover" />}
                 </div>
                 <p className="truncate text-sm">{track.title}</p>

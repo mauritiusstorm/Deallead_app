@@ -2,9 +2,9 @@ import { cn } from '@/lib/cn'
 import { useToastStore, type ToastItem } from './toastStore'
 
 const variantClasses: Record<ToastItem['variant'], string> = {
-  default: 'border-white/20 bg-black/90',
-  success: 'border-emerald-500/40 bg-black/90',
-  error: 'border-red-500/40 bg-black/90',
+  default: 'border-black/20 bg-white/90',
+  success: 'border-emerald-500/40 bg-white/90',
+  error: 'border-red-500/40 bg-white/90',
 }
 
 export function Toaster() {

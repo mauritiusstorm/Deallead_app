@@ -40,9 +40,9 @@ export default function HomePage() {
           {latestTrack.artworkUrl && (
             <img src={latestTrack.artworkUrl} alt="" className="absolute inset-0 size-full object-cover" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-blanc via-blanc/10 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-5">
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/60">Nouveau morceau</span>
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-black/60">Nouveau morceau</span>
             <h2 className="font-display text-3xl leading-none tracking-wide">{latestTrack.title}</h2>
             <Button size="sm" onClick={() => void playTrackList(tracks, artist.name, 0)}>
               Écouter
@@ -53,8 +53,8 @@ export default function HomePage() {
 
       <section className="mt-6 px-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Dernières sorties</h3>
-          <Link to="/music" className="text-xs text-white/40 hover:text-white/70">
+          <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">Dernières sorties</h3>
+          <Link to="/music" className="text-xs text-black/40 hover:text-black/70">
             Voir tout
           </Link>
         </div>
@@ -77,9 +77,9 @@ export default function HomePage() {
               <button
                 key={track.id}
                 onClick={() => void playTrackList(tracks, artist.name, i)}
-                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-black/5"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded bg-white/10">
+                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded bg-black/10">
                   {track.artworkUrl ? (
                     <img src={track.artworkUrl} alt="" className="size-full object-cover" />
                   ) : (
@@ -88,7 +88,7 @@ export default function HomePage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{track.title}</p>
-                  <p className="truncate text-xs text-white/50">{artist.name}</p>
+                  <p className="truncate text-xs text-black/50">{artist.name}</p>
                 </div>
                 <Play />
               </button>

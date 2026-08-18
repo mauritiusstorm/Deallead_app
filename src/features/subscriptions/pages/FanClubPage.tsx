@@ -27,17 +27,17 @@ export default function FanClubPage() {
 
       <div className="relative mt-4 aspect-[16/9] w-full overflow-hidden">
         {artist.coverUrl && <img src={artist.coverUrl} alt="" className="absolute inset-0 size-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-blanc via-blanc/30 to-transparent" />
       </div>
 
       <div className="flex flex-col items-center gap-3 px-6 pt-6 text-center">
         <CrownIcon className="size-8" />
         <h1 className="font-display text-2xl tracking-wide">{artist.name} FAMILY</h1>
 
-        <ul className="mt-2 flex w-full max-w-xs flex-col gap-2 text-left text-sm text-white/70">
+        <ul className="mt-2 flex w-full max-w-xs flex-col gap-2 text-left text-sm text-black/70">
           {BENEFITS.map((benefit) => (
             <li key={benefit} className="flex items-center gap-2">
-              <span className="text-blanc">✓</span>
+              <span className="text-noir">✓</span>
               {benefit}
             </li>
           ))}

@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     <div className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6">
       <h1 className="font-display text-3xl tracking-wide">Mot de passe oublié</h1>
       {sent ? (
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-black/70">
           Si un compte existe pour cet e-mail, un lien de réinitialisation vient d'être envoyé.
         </p>
       ) : (
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
           </Button>
         </form>
       )}
-      <p className="text-center text-sm text-white/50">
+      <p className="text-center text-sm text-black/50">
         <Link to="/sign-in" className="underline">
           Retour à la connexion
         </Link>

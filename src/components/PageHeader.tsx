@@ -6,14 +6,14 @@ export function PageHeader({ title, back = false }: { title: string; back?: bool
   return (
     <header className="flex items-center justify-between px-4 pt-4">
       {back ? (
-        <Link to=".." aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
+        <Link to=".." aria-label="Retour" className="p-1 text-black/70 hover:text-noir">
           <BackIcon className="size-5" />
         </Link>
       ) : (
-        <MenuIcon className="size-5 text-white/70" />
+        <MenuIcon className="size-5 text-black/70" />
       )}
       <h1 className="font-display text-lg tracking-widest uppercase">{title}</h1>
-      <Link to="/notifications" aria-label="Notifications" className="p-1 text-white/70 hover:text-blanc">
+      <Link to="/notifications" aria-label="Notifications" className="p-1 text-black/70 hover:text-noir">
         <BellIcon className="size-5" />
       </Link>
     </header>

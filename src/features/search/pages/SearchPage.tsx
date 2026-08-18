@@ -36,7 +36,7 @@ export default function SearchPage() {
       <PageHeader title="Recherche" />
 
       <div className="relative mt-4">
-        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40" />
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-black/40" />
         <Input
           className="pl-9"
           placeholder="Un morceau, un produit…"
@@ -51,15 +51,15 @@ export default function SearchPage() {
 
       {matchedTracks.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-white/50">Morceaux</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-black/50">Morceaux</h2>
           <div className="flex flex-col gap-1">
             {matchedTracks.map((track, i) => (
               <button
                 key={track.id}
                 onClick={() => void playTrackList(matchedTracks, artist?.name ?? '', i)}
-                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-black/5"
               >
-                <div className="size-10 shrink-0 overflow-hidden rounded bg-white/10">
+                <div className="size-10 shrink-0 overflow-hidden rounded bg-black/10">
                   {track.artworkUrl && <img src={track.artworkUrl} alt="" className="size-full object-cover" />}
                 </div>
                 <span className="truncate text-sm">{track.title}</span>
@@ -71,15 +71,15 @@ export default function SearchPage() {
 
       {matchedProducts.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-white/50">Boutique</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-black/50">Boutique</h2>
           <div className="flex flex-col gap-1">
             {matchedProducts.map((product) => (
               <Link
                 key={product.id}
                 to={`/shop/${product.id}`}
-                className="flex items-center gap-3 rounded-md p-2 hover:bg-white/5"
+                className="flex items-center gap-3 rounded-md p-2 hover:bg-black/5"
               >
-                <div className="size-10 shrink-0 overflow-hidden rounded bg-white/10">
+                <div className="size-10 shrink-0 overflow-hidden rounded bg-black/10">
                   {product.images[0] && <img src={product.images[0]} alt="" className="size-full object-cover" />}
                 </div>
                 <span className="truncate text-sm">{product.title}</span>

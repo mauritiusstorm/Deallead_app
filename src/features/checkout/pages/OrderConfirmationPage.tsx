@@ -13,7 +13,7 @@ export default function OrderConfirmationPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
       <h1 className="font-display text-3xl tracking-wide">Merci !</h1>
-      <p className="max-w-xs text-sm text-white/60">
+      <p className="max-w-xs text-sm text-black/60">
         Ta commande a bien été reçue. Tu recevras un e-mail de confirmation sous peu.
       </p>
       <Link to="/home">

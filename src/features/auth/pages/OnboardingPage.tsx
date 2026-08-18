@@ -17,7 +17,7 @@ export default function OnboardingPage() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center gap-6 px-6 text-center">
       <h1 className="font-display text-3xl tracking-wide">Bienvenue.</h1>
-      <p className="text-sm text-white/60">
+      <p className="text-sm text-black/60">
         Découvre tes artistes préférés, suis-les, et débloque du contenu exclusif.
       </p>
       <Button onClick={complete} className="w-full">

@@ -25,14 +25,14 @@ export function Modal({
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-white/70 sm:items-center" onClick={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full max-w-md rounded-t-xl border border-white/10 bg-noir p-5 sm:rounded-xl',
+          'w-full max-w-md rounded-t-xl border border-black/10 bg-blanc p-5 sm:rounded-xl',
           className,
         )}
       >

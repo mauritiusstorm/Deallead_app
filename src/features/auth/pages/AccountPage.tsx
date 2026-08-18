@@ -35,17 +35,17 @@ export default function AccountPage() {
   return (
     <div className="px-4 pb-6 pt-4">
       <header className="flex items-center justify-between">
-        <Link to=".." aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
+        <Link to=".." aria-label="Retour" className="p-1 text-black/70 hover:text-noir">
           <BackIcon className="size-5" />
         </Link>
-        <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Profil</span>
-        <Link to="/settings" aria-label="Réglages" className="p-1 text-white/70 hover:text-blanc">
+        <span className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">Profil</span>
+        <Link to="/settings" aria-label="Réglages" className="p-1 text-black/70 hover:text-noir">
           <MoreIcon className="size-5" />
         </Link>
       </header>
 
       <div className="mt-6 flex flex-col items-center gap-3 text-center">
-        <div className="size-24 overflow-hidden rounded-full bg-white/10">
+        <div className="size-24 overflow-hidden rounded-full bg-black/10">
           {artist.avatarUrl && <img src={artist.avatarUrl} alt={artist.name} className="size-full object-cover" />}
         </div>
         <h1 className="font-display text-2xl tracking-wide">{artist.name}</h1>
@@ -53,15 +53,15 @@ export default function AccountPage() {
         <div className="flex gap-8">
           <div className="text-center">
             <p className="font-display text-xl">{tracks.length}</p>
-            <p className="text-[11px] uppercase tracking-wider text-white/40">Sorties</p>
+            <p className="text-[11px] uppercase tracking-wider text-black/40">Sorties</p>
           </div>
           <div className="text-center">
             <p className="font-display text-xl">{formatCompactNumber(artist.followerCount)}</p>
-            <p className="text-[11px] uppercase tracking-wider text-white/40">Auditeurs</p>
+            <p className="text-[11px] uppercase tracking-wider text-black/40">Auditeurs</p>
           </div>
           <div className="text-center">
             <p className="font-display text-xl">{formatCompactNumber(streams)}</p>
-            <p className="text-[11px] uppercase tracking-wider text-white/40">Streams</p>
+            <p className="text-[11px] uppercase tracking-wider text-black/40">Streams</p>
           </div>
         </div>
 
@@ -76,12 +76,12 @@ export default function AccountPage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">À propos</h2>
-        <p className="mt-2 text-sm text-white/70">
+        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">À propos</h2>
+        <p className="mt-2 text-sm text-black/70">
           {bioIsLong && !bioExpanded ? `${bio.slice(0, 120)}…` : bio}
         </p>
         {bioIsLong && (
-          <button onClick={() => setBioExpanded((v) => !v)} className="mt-1 text-xs text-white/40 hover:text-white/70">
+          <button onClick={() => setBioExpanded((v) => !v)} className="mt-1 text-xs text-black/40 hover:text-black/70">
             {bioExpanded ? 'Voir moins' : 'Voir plus'}
           </button>
         )}

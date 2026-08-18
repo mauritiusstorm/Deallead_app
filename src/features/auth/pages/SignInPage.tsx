@@ -61,7 +61,7 @@ export default function SignInPage() {
           autoComplete="current-password"
           error={error ?? undefined}
         />
-        <Link to="/forgot-password" className="text-sm text-white/50 hover:text-white/80">
+        <Link to="/forgot-password" className="text-sm text-black/50 hover:text-black/80">
           {t('auth.forgotPassword')}
         </Link>
         <Button type="submit" loading={loading}>
@@ -71,7 +71,7 @@ export default function SignInPage() {
       <Button variant="secondary" onClick={handleGoogle} disabled={loading}>
         {t('auth.continueWithGoogle')}
       </Button>
-      <p className="text-center text-sm text-white/50">
+      <p className="text-center text-sm text-black/50">
         <Link to="/sign-up" className="underline">
           {t('auth.signUp')}
         </Link>

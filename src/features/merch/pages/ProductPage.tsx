@@ -47,14 +47,14 @@ export default function ProductPage() {
 
   return (
     <div className="pb-6">
-      <div className="aspect-square w-full bg-white/10">
+      <div className="aspect-square w-full bg-black/10">
         {product.images[0] && <img src={product.images[0]} alt={product.title} className="size-full object-cover" />}
       </div>
 
       <div className="px-4 pt-4">
         <h1 className="font-display text-2xl tracking-wide">{product.title}</h1>
         {selectedVariant && <p className="mt-1 text-lg">{formatMoney(selectedVariant.priceCents, product.currency)}</p>}
-        <p className="mt-3 text-sm text-white/60">{product.description}</p>
+        <p className="mt-3 text-sm text-black/60">{product.description}</p>
 
         {variants.length > 1 && (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -65,8 +65,8 @@ export default function ProductPage() {
                 disabled={variant.stockQuantity === 0}
                 className={`rounded-md border px-3 py-1.5 text-sm disabled:opacity-30 ${
                   (selectedVariant?.id ?? variants[0]?.id) === variant.id
-                    ? 'border-blanc bg-blanc text-noir'
-                    : 'border-white/25 text-blanc'
+                    ? 'border-noir bg-noir text-blanc'
+                    : 'border-black/25 text-noir'
                 }`}
               >
                 {variant.label}

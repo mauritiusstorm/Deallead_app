@@ -226,7 +226,7 @@ fee reconciliation.
 ## 9. PWA architecture
 
 `vite-plugin-pwa`, `generateSW` strategy. Manifest: standalone, portrait,
-black theme/background, brand icons (placeholder assets — see §12).
+white theme/background (black text/icons — the brand identity is light, not dark), brand icons (placeholder assets — see §12).
 Caching is deliberately narrow:
 
 - **Cached**: the built app shell (JS/CSS/HTML), static assets, Google

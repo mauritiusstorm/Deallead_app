@@ -40,11 +40,11 @@ export default function AlbumPage() {
       <PageHeader title={album.title} back />
 
       <div className="mt-4 flex flex-col items-center gap-2 px-6 text-center">
-        <div className="aspect-square w-48 overflow-hidden rounded-lg bg-white/10">
+        <div className="aspect-square w-48 overflow-hidden rounded-lg bg-black/10">
           {album.artworkUrl && <img src={album.artworkUrl} alt="" className="size-full object-cover" />}
         </div>
         <h1 className="mt-2 font-display text-2xl tracking-wide">{album.title}</h1>
-        <p className="text-sm text-white/50">{artist?.name}</p>
+        <p className="text-sm text-black/50">{artist?.name}</p>
       </div>
 
       <div className="mt-6 px-4">
@@ -66,15 +66,15 @@ export default function AlbumPage() {
                 <button
                   key={track.id}
                   onClick={() => (isCurrent ? togglePlay() : void playTrackList(tracks, artist?.name ?? '', i))}
-                  className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
+                  className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-black/5"
                 >
-                  <span className="w-5 shrink-0 text-center text-xs text-white/40">
+                  <span className="w-5 shrink-0 text-center text-xs text-black/40">
                     {isCurrent && isPlaying ? <Pause /> : track.trackNumber}
                   </span>
-                  <span className={`min-w-0 flex-1 truncate text-sm ${isCurrent ? 'text-blanc' : 'text-white/85'}`}>
+                  <span className={`min-w-0 flex-1 truncate text-sm ${isCurrent ? 'text-noir' : 'text-black/85'}`}>
                     {track.title}
                   </span>
-                  <span className="shrink-0 text-xs text-white/40">{formatDuration(track.durationSeconds)}</span>
+                  <span className="shrink-0 text-xs text-black/40">{formatDuration(track.durationSeconds)}</span>
                 </button>
               )
             })}

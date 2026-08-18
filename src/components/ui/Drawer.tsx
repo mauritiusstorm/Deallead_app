@@ -16,11 +16,11 @@ export function Drawer({
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 bg-black/70" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-white/70" onClick={onClose}>
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'absolute border-white/10 bg-noir p-5',
+          'absolute border-black/10 bg-blanc p-5',
           side === 'bottom'
             ? 'inset-x-0 bottom-0 rounded-t-xl border-t safe-bottom'
             : 'inset-y-0 right-0 h-full w-full max-w-sm border-l',

@@ -9,7 +9,7 @@ export function ErrorState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <p className="text-sm text-white/70">{message}</p>
+      <p className="text-sm text-black/70">{message}</p>
       {onRetry && (
         <Button variant="secondary" size="sm" onClick={onRetry}>
           Réessayer

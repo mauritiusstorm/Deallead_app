@@ -55,11 +55,11 @@ export default function ShopPage() {
         <div className="mt-4 grid grid-cols-2 gap-4 px-4">
           {filtered.map((product) => (
             <Link key={product.id} to={`/shop/${product.id}`}>
-              <div className="aspect-square overflow-hidden rounded-md bg-white/10">
+              <div className="aspect-square overflow-hidden rounded-md bg-black/10">
                 {product.images[0] && <img src={product.images[0]} alt="" className="size-full object-cover" />}
               </div>
               <p className="mt-2 truncate text-sm">{product.title}</p>
-              <p className="text-xs text-white/50">{formatMoney(product.minPriceCents, product.currency)}</p>
+              <p className="text-xs text-black/50">{formatMoney(product.minPriceCents, product.currency)}</p>
             </Link>
           ))}
         </div>

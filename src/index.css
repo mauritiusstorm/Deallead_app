@@ -15,11 +15,11 @@
   }
 
   body {
-    @apply bg-noir text-blanc font-sans antialiased;
+    @apply bg-blanc text-noir font-sans antialiased;
   }
 
   ::selection {
-    @apply bg-blanc text-noir;
+    @apply bg-noir text-blanc;
   }
 }
 

@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 export function AdminLayout() {
   return (
     <div className="flex min-h-dvh flex-col sm:flex-row">
-      <aside className="shrink-0 border-white/10 sm:w-56 sm:border-r">
+      <aside className="shrink-0 border-black/10 sm:w-56 sm:border-r">
         <div className="flex gap-1 overflow-x-auto p-3 sm:flex-col sm:overflow-visible">
           {NAV_ITEMS.map((item) => (
             <NavLink
@@ -26,7 +26,7 @@ export function AdminLayout() {
               className={({ isActive }) =>
                 cn(
                   'shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-sm',
-                  isActive ? 'bg-white text-noir' : 'text-white/60 hover:bg-white/10',
+                  isActive ? 'bg-black text-blanc' : 'text-black/60 hover:bg-black/10',
                 )
               }
             >

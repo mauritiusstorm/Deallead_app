@@ -14,8 +14,8 @@ export async function initNativeApp(onDeepLink: (path: string) => void): Promise
     import('@capacitor/app'),
   ])
 
-  await StatusBar.setStyle({ style: Style.Dark })
-  await StatusBar.setBackgroundColor({ color: '#000000' })
+  await StatusBar.setStyle({ style: Style.Light })
+  await StatusBar.setBackgroundColor({ color: '#ffffff' })
   await SplashScreen.hide()
 
   App.addListener('appUrlOpen', ({ url }) => {
