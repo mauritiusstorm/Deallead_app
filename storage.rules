@@ -1,0 +1,85 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────
+// Deallead — Firebase Storage Security Rules
+//
+// Path layout (see ARCHITECTURE.md §Storage):
+//   artists/{artistId}/tracks/{trackId}/...
+//   artists/{artistId}/albums/{albumId}/...
+//   artists/{artistId}/products/{productId}/...
+//   users/{userId}/avatar/...
+//   exclusive/{artistId}/{contentId}/...
+//
+// A public download URL is never itself an authorization boundary — access
+// to `exclusive/**` is gated here by the requester's Firestore membership
+// (subscription doc or artist membership), matching firestore.rules.
+// ─────────────────────────────────────────────────────────────────────────
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function isPlatformAdmin() {
+  return isSignedIn() && request.auth.token.platform_admin == true;
+}
+
+function isArtistMember(artistId) {
+  let membershipId = artistId + '_' + request.auth.uid;
+  return isSignedIn() &&
+    firestore.exists(/databases/(default)/documents/artistMembers/$(membershipId)) &&
+    firestore.get(/databases/(default)/documents/artistMembers/$(membershipId)).data.status == 'active';
+}
+
+function hasActiveSubscription(artistId) {
+  let subId = request.auth.uid + '_' + artistId;
+  return isSignedIn() &&
+    firestore.exists(/databases/(default)/documents/subscriptions/$(subId)) &&
+    firestore.get(/databases/(default)/documents/subscriptions/$(subId)).data.status in ['trialing', 'active'];
+}
+
+function isValidAudioUpload() {
+  return request.resource.size < 200 * 1024 * 1024 &&
+    request.resource.contentType.matches('audio/.*');
+}
+
+function isValidImageUpload() {
+  return request.resource.size < 15 * 1024 * 1024 &&
+    request.resource.contentType.matches('image/.*');
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /artists/{artistId}/tracks/{trackId}/{fileName} {
+      allow read: if true; // artwork + published-track audio; gating happens at the Firestore doc / signed-URL layer for drafts.
+      allow write: if isArtistMember(artistId) && (isValidAudioUpload() || isValidImageUpload());
+    }
+
+    match /artists/{artistId}/albums/{albumId}/{fileName} {
+      allow read: if true;
+      allow write: if isArtistMember(artistId) && isValidImageUpload();
+    }
+
+    match /artists/{artistId}/products/{productId}/{fileName} {
+      allow read: if true;
+      allow write: if isArtistMember(artistId) && isValidImageUpload();
+    }
+
+    match /artists/{artistId}/branding/{fileName} {
+      allow read: if true;
+      allow write: if isArtistMember(artistId) && isValidImageUpload();
+    }
+
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId && isValidImageUpload();
+    }
+
+    // Exclusive content is never publicly readable — only an active
+    // subscriber, the owning artist team, or a platform admin.
+    match /exclusive/{artistId}/{contentId}/{fileName} {
+      allow read: if hasActiveSubscription(artistId) || isArtistMember(artistId) || isPlatformAdmin();
+      allow write: if isArtistMember(artistId);
+    }
+  }
+}

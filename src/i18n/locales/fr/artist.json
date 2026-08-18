@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "title": "Tableau de bord",
+    "listeners": "Auditeurs uniques",
+    "plays": "Écoutes",
+    "revenue": "Revenus"
+  },
+  "nav": {
+    "overview": "Aperçu",
+    "music": "Musique",
+    "content": "Contenu",
+    "merch": "Boutique",
+    "events": "Événements",
+    "revenue": "Revenus",
+    "team": "Équipe",
+    "settings": "Paramètres"
+  }
+}

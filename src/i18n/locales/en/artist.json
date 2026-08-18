@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "listeners": "Unique listeners",
+    "plays": "Plays",
+    "revenue": "Revenue"
+  },
+  "nav": {
+    "overview": "Overview",
+    "music": "Music",
+    "content": "Content",
+    "merch": "Merch",
+    "events": "Events",
+    "revenue": "Revenue",
+    "team": "Team",
+    "settings": "Settings"
+  }
+}

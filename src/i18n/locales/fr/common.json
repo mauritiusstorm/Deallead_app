@@ -1,0 +1,38 @@
+{
+  "app": {
+    "tagline": "Music. Culture. Ambition."
+  },
+  "nav": {
+    "home": "Accueil",
+    "search": "Recherche",
+    "shop": "Boutique",
+    "account": "Profil",
+    "library": "Bibliothèque"
+  },
+  "actions": {
+    "play": "Écouter",
+    "pause": "Pause",
+    "follow": "Suivre",
+    "following": "Abonné",
+    "addToCart": "Ajouter au panier",
+    "subscribe": "S'abonner",
+    "retry": "Réessayer",
+    "seeAll": "Voir tout",
+    "logout": "Déconnexion",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "auth": {
+    "signIn": "Connexion",
+    "signUp": "Inscription",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "continueWithGoogle": "Continuer avec Google"
+  },
+  "states": {
+    "loading": "Chargement…",
+    "empty": "Rien à afficher pour le moment.",
+    "error": "Une erreur est survenue."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "app": {
+    "tagline": "Music. Culture. Ambition."
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "shop": "Shop",
+    "account": "Account",
+    "library": "Library"
+  },
+  "actions": {
+    "play": "Play",
+    "pause": "Pause",
+    "follow": "Follow",
+    "following": "Following",
+    "addToCart": "Add to cart",
+    "subscribe": "Subscribe",
+    "retry": "Retry",
+    "seeAll": "See all",
+    "logout": "Log out",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "states": {
+    "loading": "Loading…",
+    "empty": "Nothing to show yet.",
+    "error": "Something went wrong."
+  }
+}

@@ -1,0 +1,244 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────
+// Deallead — Firestore Security Rules
+//
+// Conventions this file relies on (see ARCHITECTURE.md §Firestore schema):
+//  - artistMembers/{artistId}_{userId}   → O(1) membership lookup, no query
+//  - favorites/{userId}_{trackId}
+//  - follows/{userId}_{artistId}
+//  - subscriptions/{userId}_{artistId}
+//  - fcmTokens/{userId}_{deviceId}
+//
+// Money-moving documents (orders, subscriptions, revenueTransactions,
+// revenueSplits, payouts, ticketOrders) are written EXCLUSIVELY by Cloud
+// Functions using the Admin SDK, which bypasses these rules entirely.
+// Client writes to those collections are always denied — this is
+// intentional, not an oversight.
+// ─────────────────────────────────────────────────────────────────────────
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function isSelf(userId) {
+  return isSignedIn() && request.auth.uid == userId;
+}
+
+function isPlatformAdmin() {
+  return isSignedIn() && request.auth.token.platform_admin == true;
+}
+
+function isModerator() {
+  return isSignedIn() && (request.auth.token.moderator == true || isPlatformAdmin());
+}
+
+function membershipId(artistId) {
+  return artistId + '_' + request.auth.uid;
+}
+
+function isArtistMember(artistId) {
+  return isSignedIn() &&
+    exists(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))) &&
+    get(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))).data.status == 'active';
+}
+
+function artistRole(artistId) {
+  return get(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))).data.role;
+}
+
+function hasArtistRole(artistId, roles) {
+  return isArtistMember(artistId) && artistRole(artistId) in roles;
+}
+
+function hasActiveSubscription(artistId) {
+  let subId = request.auth.uid + '_' + artistId;
+  return isSignedIn() &&
+    exists(/databases/$(database)/documents/subscriptions/$(subId)) &&
+    get(/databases/$(database)/documents/subscriptions/$(subId)).data.status in ['trialing', 'active'];
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users ──
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isPlatformAdmin();
+      allow create: if isSelf(userId);
+      // Never allow a user to grant themselves elevated fields client-side.
+      allow update: if isSelf(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['id', 'createdAt', 'email']);
+      allow delete: if false;
+    }
+
+    match /fcmTokens/{tokenId} {
+      allow read, write: if isSignedIn() && tokenId.split('_')[0] == request.auth.uid;
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create, delete: if false; // Cloud Functions only.
+    }
+
+    // ── artists ──
+    match /artists/{artistId} {
+      allow read: if resource.data.status == 'published' || isArtistMember(artistId) || isPlatformAdmin();
+      allow create: if isSignedIn(); // creator becomes owner via a Cloud Function trigger.
+      allow update: if hasArtistRole(artistId, ['owner', 'admin']) || isPlatformAdmin();
+      allow delete: if false;
+    }
+
+    match /artistMembers/{membershipDocId} {
+      allow read: if isSignedIn() &&
+        (membershipDocId == membershipId(resource.data.artistId) || isPlatformAdmin() ||
+         hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager']));
+      // Invites/role changes go through a Cloud Function so tokens and
+      // role-escalation can be validated server-side.
+      allow write: if false;
+    }
+
+    match /follows/{followId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSignedIn() && followId == request.auth.uid + '_' + request.resource.data.artistId;
+      allow update: if false;
+    }
+
+    // ── music ──
+    match /tracks/{trackId} {
+      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow create: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
+      allow update, delete: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
+    }
+
+    match /albums/{albumId} {
+      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow create: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
+      allow update, delete: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
+    }
+
+    match /playlists/{playlistId} {
+      allow read: if resource.data.isPublic == true || isSelf(resource.data.ownerUserId);
+      allow write: if isSelf(request.resource.data.ownerUserId);
+    }
+
+    match /favorites/{favoriteId} {
+      allow read: if isSignedIn() && favoriteId.split('_')[0] == request.auth.uid;
+      allow create, delete: if isSignedIn() && favoriteId == request.auth.uid + '_' + request.resource.data.trackId;
+      allow update: if false;
+    }
+
+    match /exclusiveContents/{contentId} {
+      allow read: if resource.data.status == 'published' &&
+        (resource.data.accessLevel == 'free' ||
+         (resource.data.accessLevel == 'fan' && hasActiveSubscription(resource.data.artistId)) ||
+         resource.data.accessLevel == 'purchase') || // purchase-gated media URL itself is protected via Storage rules
+        isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
+    }
+
+    // ── listening analytics: significant events only, write-once from the client ──
+    match /listeningEvents/{eventId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if false; // consumed server-side / exported to BigQuery later.
+    }
+
+    match /listeningSessions/{sessionId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSelf(resource.data.userId);
+      allow update, delete: if false;
+    }
+
+    // ── merch ──
+    match /products/{productId} {
+      allow read: if resource.data.status == 'active' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
+
+      match /variants/{variantId} {
+        allow read: if true;
+        allow write: if hasArtistRole(get(/databases/$(database)/documents/products/$(productId)).data.artistId, ['owner', 'admin', 'manager']);
+      }
+    }
+
+    match /promoCodes/{codeId} {
+      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
+    }
+
+    // ── orders / checkout: read-only for the client, all writes are server-side ──
+    match /orders/{orderId} {
+      allow read: if isSelf(resource.data.userId) ||
+        hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow write: if false;
+
+      match /items/{itemId} {
+        allow read: if isSelf(get(/databases/$(database)/documents/orders/$(orderId)).data.userId) ||
+          hasArtistRole(get(/databases/$(database)/documents/orders/$(orderId)).data.artistId, ['owner', 'admin', 'manager', 'finance']);
+        allow write: if false;
+      }
+    }
+
+    // ── subscriptions: read-only for the client, all writes are server-side ──
+    match /subscriptions/{subscriptionId} {
+      allow read: if isSignedIn() && subscriptionId.split('_')[0] == request.auth.uid ||
+        hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow write: if false;
+    }
+
+    match /plans/{planId} {
+      allow read: if resource.data.active == true || isPlatformAdmin();
+      allow write: if isPlatformAdmin() ||
+        (resource.data.artistId != null && hasArtistRole(resource.data.artistId, ['owner', 'admin']));
+    }
+
+    // ── events / ticketing ──
+    match /events/{eventId} {
+      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
+    }
+
+    match /ticketOrders/{ticketOrderId} {
+      allow read: if isSelf(resource.data.userId) ||
+        hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow write: if false;
+    }
+
+    // ── financial ledger: never writable by the client, admin-SDK only ──
+    match /revenueTransactions/{transactionId} {
+      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow write: if false;
+    }
+
+    match /revenueSplits/{splitId} {
+      allow read: if isPlatformAdmin(); // artists read via an aggregated Cloud Function, not raw splits.
+      allow write: if false;
+    }
+
+    match /payouts/{payoutId} {
+      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow write: if false;
+    }
+
+    match /processedStripeEvents/{eventId} {
+      allow read, write: if false; // internal idempotency ledger, Admin SDK only.
+    }
+
+    // ── ads ──
+    match /advertisements/{adId} {
+      allow read: if isPlatformAdmin();
+      allow write: if isPlatformAdmin();
+    }
+
+    match /adImpressions/{impressionId} {
+      allow create: if isSignedIn() || request.resource.data.userId == null;
+      allow read, update, delete: if isPlatformAdmin();
+    }
+
+    // ── moderation / admin-only collections ──
+    match /moderationActions/{actionId} {
+      allow read, write: if isModerator();
+    }
+  }
+}
