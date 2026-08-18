@@ -14,6 +14,7 @@ const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswo
 const OnboardingPage = lazy(() => import('@/features/auth/pages/OnboardingPage'))
 const HomePage = lazy(() => import('@/features/music/pages/HomePage'))
 const MusicPage = lazy(() => import('@/features/music/pages/MusicPage'))
+const AlbumPage = lazy(() => import('@/features/music/pages/AlbumPage'))
 const ShopPage = lazy(() => import('@/features/merch/pages/ShopPage'))
 const ProductPage = lazy(() => import('@/features/merch/pages/ProductPage'))
 const CartPage = lazy(() => import('@/features/checkout/pages/CartPage'))
@@ -21,10 +22,11 @@ const OrderConfirmationPage = lazy(() => import('@/features/checkout/pages/Order
 const NowPlayingPage = lazy(() => import('@/features/player/pages/NowPlayingPage'))
 const AccountPage = lazy(() => import('@/features/auth/pages/AccountPage'))
 const SettingsPage = lazy(() => import('@/features/auth/pages/SettingsPage'))
+const SearchPage = lazy(() => import('@/features/search/pages/SearchPage'))
+const FanClubPage = lazy(() => import('@/features/subscriptions/pages/FanClubPage'))
 
-/** Screens deferred beyond this pass (events/ticketing, subscriptions, exclusive content) — routed and typed, content later. */
+/** Screens deferred beyond this pass (events/ticketing, exclusive content) — routed and typed, content later. */
 const FAN_PLACEHOLDERS: { path: string; title: string }[] = [
-  { path: '/albums/:albumId', title: 'Album' },
   { path: '/queue', title: 'File d’attente' },
   { path: '/library', title: 'Bibliothèque' },
   { path: '/library/favorites', title: 'Favoris' },
@@ -33,7 +35,6 @@ const FAN_PLACEHOLDERS: { path: string; title: string }[] = [
   { path: '/account/tickets', title: 'Billets' },
   { path: '/events', title: 'Événements' },
   { path: '/events/:eventId', title: 'Événement' },
-  { path: '/subscribe', title: 'Abonnement' },
   { path: '/exclusive/:contentId', title: 'Contenu exclusif' },
   { path: '/notifications', title: 'Notifications' },
 ]
@@ -105,6 +106,9 @@ export function AppRoutes() {
       >
         <Route path="/home" element={<HomePage />} />
         <Route path="/music" element={<MusicPage />} />
+        <Route path="/albums/:albumId" element={<AlbumPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/fan-club" element={<FanClubPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/shop/:productId" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />

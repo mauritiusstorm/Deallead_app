@@ -14,6 +14,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "albumId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "trackNumber", "order": "ASCENDING" }
       ]
     },

@@ -19,6 +19,8 @@ export const productSchema = baseDocSchema.extend({
   description: z.string().max(3000).default(''),
   category: z.enum(['apparel', 'accessories', 'other']).default('apparel'),
   images: z.array(z.string().url()).default([]),
+  /** Denormalized min(variant.priceCents) — lets list views show a price without an N+1 variants fetch. Kept in sync wherever variants are written. */
+  minPriceCents: moneySchema,
   currency: currencySchema.default('EUR'),
   status: z.enum(['draft', 'active', 'archived']).default('draft'),
   createdBy: z.string(),

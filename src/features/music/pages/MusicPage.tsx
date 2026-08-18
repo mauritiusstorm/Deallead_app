@@ -1,67 +1,122 @@
-import { useTranslation } from 'react-i18next'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { THE_ARTIST_SLUG } from '@/config/artist'
 import { useArtistBySlug } from '@/features/artists/hooks/useArtistBySlug'
 import { useArtistTracks } from '../hooks/useArtistTracks'
-import { usePlayerStore } from '@/features/player/store'
+import { useArtistAlbums } from '../hooks/useArtistAlbums'
 import { playTrackList } from '../playTracks'
-import { Skeleton, ErrorState, EmptyState } from '@/components/ui'
-import { Pause, Play } from '@/features/player/icons'
+import { Skeleton, ErrorState, EmptyState, Tabs } from '@/components/ui'
+import { PageHeader } from '@/components/PageHeader'
+import { ChevronRightIcon } from '@/components/icons'
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = Math.floor(seconds % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
+type Tab = 'albums' | 'singles' | 'playlists'
+
+function timestampToYear(value: unknown): string {
+  if (!value) return ''
+  if (value instanceof Date) return String(value.getFullYear())
+  const withToDate = value as { toDate?: () => Date }
+  if (typeof withToDate.toDate === 'function') return String(withToDate.toDate().getFullYear())
+  const date = new Date(value as number)
+  return Number.isNaN(date.getTime()) ? '' : String(date.getFullYear())
 }
 
 export default function MusicPage() {
-  const { t } = useTranslation()
+  const [tab, setTab] = useState<Tab>('albums')
   const { artist, loading: artistLoading, error: artistError } = useArtistBySlug(THE_ARTIST_SLUG)
-  const { tracks, loading, error } = useArtistTracks(artist?.id)
-  const currentTrackId = usePlayerStore((s) => s.queue[s.currentIndex]?.id)
-  const isPlaying = usePlayerStore((s) => s.isPlaying)
-  const togglePlay = usePlayerStore((s) => s.togglePlay)
+  const { tracks, loading: tracksLoading, error: tracksError } = useArtistTracks(artist?.id)
+  const { albums, loading: albumsLoading, error: albumsError } = useArtistAlbums(artist?.id)
 
-  if (artistLoading || loading) {
+  const singles = useMemo(() => tracks.filter((t) => !t.albumId), [tracks])
+  const loading = artistLoading || (tab === 'albums' ? albumsLoading : tracksLoading)
+  const error = artistError || (tab === 'albums' ? albumsError : tracksError)
+
+  if (artistLoading) {
     return (
       <div className="px-4 pt-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="mb-2 h-14 w-full rounded-md" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="mb-2 h-16 w-full rounded-md" />
         ))}
       </div>
     )
   }
 
-  if (artistError || error) return <ErrorState />
+  if (artistError) return <ErrorState />
   if (!artist) return <EmptyState title="Artiste introuvable" />
 
   return (
-    <div className="px-4 pt-6">
-      <h1 className="font-display text-2xl tracking-wide">{t('nav.music')}</h1>
+    <div className="pb-6">
+      <PageHeader title="Musique" />
 
-      {tracks.length === 0 && (
-        <EmptyState title="Aucun morceau" description="Reviens bientôt pour écouter de nouveaux sons." />
-      )}
+      <div className="mt-4 px-4">
+        <Tabs
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { value: 'albums', label: 'Albums' },
+            { value: 'singles', label: 'Singles' },
+            { value: 'playlists', label: 'Playlists' },
+          ]}
+        />
+      </div>
 
-      <div className="mt-4 flex flex-col gap-1">
-        {tracks.map((track, i) => {
-          const isCurrent = track.id === currentTrackId
-          return (
-            <button
-              key={track.id}
-              onClick={() => (isCurrent ? togglePlay() : void playTrackList(tracks, artist.name, i))}
-              className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
-            >
-              <div className="relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded bg-white/10">
-                {track.artworkUrl && <img src={track.artworkUrl} alt="" className="absolute inset-0 size-full object-cover" />}
-                <span className="relative">{isCurrent && isPlaying ? <Pause /> : <Play />}</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className={`truncate text-sm ${isCurrent ? 'text-blanc' : 'text-white/85'}`}>{track.title}</p>
-              </div>
-              <span className="shrink-0 text-xs text-white/40">{formatDuration(track.durationSeconds)}</span>
-            </button>
-          )
-        })}
+      <div className="mt-4 px-4">
+        {loading && (
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-md" />
+            ))}
+          </div>
+        )}
+
+        {!loading && error && <ErrorState />}
+
+        {!loading && !error && tab === 'albums' && albums.length === 0 && <EmptyState title="Aucun album" />}
+        {!loading && !error && tab === 'albums' && albums.length > 0 && (
+          <div className="flex flex-col gap-1">
+            {albums.map((album) => (
+              <Link
+                key={album.id}
+                to={`/albums/${album.id}`}
+                className="flex items-center gap-3 rounded-md p-2 hover:bg-white/5"
+              >
+                <div className="size-14 shrink-0 overflow-hidden rounded bg-white/10">
+                  {album.artworkUrl && <img src={album.artworkUrl} alt="" className="size-full object-cover" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{album.title}</p>
+                  <p className="truncate text-xs text-white/50">
+                    {timestampToYear(album.releaseDate)} · {album.trackCount} titres
+                  </p>
+                </div>
+                <ChevronRightIcon className="size-4 shrink-0 text-white/30" />
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {!loading && !error && tab === 'singles' && singles.length === 0 && (
+          <EmptyState title="Aucun single" description="Les morceaux hors album apparaîtront ici." />
+        )}
+        {!loading && !error && tab === 'singles' && singles.length > 0 && (
+          <div className="flex flex-col gap-1">
+            {singles.map((track, i) => (
+              <button
+                key={track.id}
+                onClick={() => void playTrackList(singles, artist.name, i)}
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/5"
+              >
+                <div className="size-11 shrink-0 overflow-hidden rounded bg-white/10">
+                  {track.artworkUrl && <img src={track.artworkUrl} alt="" className="size-full object-cover" />}
+                </div>
+                <p className="truncate text-sm">{track.title}</p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {tab === 'playlists' && (
+          <EmptyState title="Aucune playlist" description="Cette section arrive prochainement." />
+        )}
       </div>
     </div>
   )
