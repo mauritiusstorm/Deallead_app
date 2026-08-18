@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { Button, Card } from '@/components/ui'
 import { useAuthStore } from '../store'
 import { signOutUser } from '../api'
+import { THE_ARTIST_SLUG } from '@/config/artist'
+import { useArtistBySlug } from '@/features/artists/hooks/useArtistBySlug'
+import { useArtistMembership } from '@/features/artists/hooks/useArtistMembership'
 
 const LINKS = [
   { to: '/account/orders', label: 'Commandes' },
@@ -16,6 +19,8 @@ const LINKS = [
 export default function AccountPage() {
   const { t } = useTranslation()
   const profile = useAuthStore((s) => s.profile)
+  const { artist } = useArtistBySlug(THE_ARTIST_SLUG)
+  const { membership } = useArtistMembership(artist?.id)
 
   return (
     <div className="px-4 pt-6">
@@ -37,6 +42,14 @@ export default function AccountPage() {
           </Link>
         ))}
       </div>
+
+      {membership && artist && (
+        <Link key="artist-dashboard" to={`/artist/${artist.id}`}>
+          <Button variant="secondary" className="mt-6 w-full">
+            Espace artiste
+          </Button>
+        </Link>
+      )}
 
       <Button variant="secondary" className="mt-6 w-full" onClick={() => void signOutUser()}>
         {t('actions.logout')}

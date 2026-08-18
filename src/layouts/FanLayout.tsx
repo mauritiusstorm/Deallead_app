@@ -6,7 +6,7 @@ import { cn } from '@/lib/cn'
 
 const NAV_ITEMS = [
   { to: '/home', labelKey: 'nav.home' },
-  { to: '/search', labelKey: 'nav.search' },
+  { to: '/music', labelKey: 'nav.music' },
   { to: '/shop', labelKey: 'nav.shop' },
   { to: '/account', labelKey: 'nav.account' },
 ] as const

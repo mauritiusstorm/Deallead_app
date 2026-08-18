@@ -1,22 +1,6 @@
 {
   "indexes": [
     {
-      "collectionGroup": "artists",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "followerCount", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "artists",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "nameLower", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "tracks",
       "queryScope": "COLLECTION",
       "fields": [

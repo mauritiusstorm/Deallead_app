@@ -1,33 +1,35 @@
 import { useEffect, useState } from 'react'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import type { Artist } from '@/types'
+import type { Track } from '@/types'
 
-export function useFeaturedArtists(max = 10) {
-  const [artists, setArtists] = useState<Artist[]>([])
+export function useArtistTracks(artistId: string | undefined, max = 50) {
+  const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!artistId) return
     let cancelled = false
     setLoading(true)
     const q = query(
-      collection(db, 'artists'),
+      collection(db, 'tracks'),
+      where('artistId', '==', artistId),
       where('status', '==', 'published'),
-      orderBy('followerCount', 'desc'),
+      orderBy('releaseDate', 'desc'),
       limit(max),
     )
     getDocs(q)
       .then((snapshot) => {
         if (cancelled) return
-        setArtists(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Artist))
+        setTracks(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Track))
       })
       .catch(() => !cancelled && setError('load_failed'))
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
-  }, [max])
+  }, [artistId, max])
 
-  return { artists, loading, error }
+  return { tracks, loading, error }
 }

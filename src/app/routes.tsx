@@ -13,29 +13,27 @@ const SignUpPage = lazy(() => import('@/features/auth/pages/SignUpPage'))
 const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'))
 const OnboardingPage = lazy(() => import('@/features/auth/pages/OnboardingPage'))
 const HomePage = lazy(() => import('@/features/music/pages/HomePage'))
-const SearchPage = lazy(() => import('@/features/search/pages/SearchPage'))
-const ArtistProfilePage = lazy(() => import('@/features/artists/pages/ArtistProfilePage'))
+const MusicPage = lazy(() => import('@/features/music/pages/MusicPage'))
+const ShopPage = lazy(() => import('@/features/merch/pages/ShopPage'))
+const ProductPage = lazy(() => import('@/features/merch/pages/ProductPage'))
+const CartPage = lazy(() => import('@/features/checkout/pages/CartPage'))
+const OrderConfirmationPage = lazy(() => import('@/features/checkout/pages/OrderConfirmationPage'))
 const NowPlayingPage = lazy(() => import('@/features/player/pages/NowPlayingPage'))
 const AccountPage = lazy(() => import('@/features/auth/pages/AccountPage'))
 const SettingsPage = lazy(() => import('@/features/auth/pages/SettingsPage'))
 
-/** MVP fan screens not yet fleshed out — routed and typed, content deferred post-Phase-1. */
+/** Screens deferred beyond this pass (events/ticketing, subscriptions, exclusive content) — routed and typed, content later. */
 const FAN_PLACEHOLDERS: { path: string; title: string }[] = [
   { path: '/albums/:albumId', title: 'Album' },
   { path: '/queue', title: 'File d’attente' },
   { path: '/library', title: 'Bibliothèque' },
   { path: '/library/favorites', title: 'Favoris' },
   { path: '/library/history', title: 'Historique' },
-  { path: '/shop', title: 'Boutique' },
-  { path: '/shop/:productId', title: 'Produit' },
-  { path: '/cart', title: 'Panier' },
-  { path: '/checkout', title: 'Paiement' },
-  { path: '/checkout/confirmation/:orderId', title: 'Commande confirmée' },
   { path: '/account/orders', title: 'Commandes' },
   { path: '/account/tickets', title: 'Billets' },
   { path: '/events', title: 'Événements' },
   { path: '/events/:eventId', title: 'Événement' },
-  { path: '/artists/:slug/subscribe', title: 'Abonnement' },
+  { path: '/subscribe', title: 'Abonnement' },
   { path: '/exclusive/:contentId', title: 'Contenu exclusif' },
   { path: '/notifications', title: 'Notifications' },
 ]
@@ -58,8 +56,6 @@ const ARTIST_DASHBOARD_PLACEHOLDERS: { path: string; title: string }[] = [
   { path: 'revenue', title: 'Revenus' },
   { path: 'revenue/transactions', title: 'Transactions' },
   { path: 'revenue/payouts', title: 'Payouts' },
-  { path: 'team', title: 'Équipe' },
-  { path: 'team/invite', title: 'Inviter un membre' },
   { path: 'settings', title: 'Paramètres du profil' },
   { path: 'settings/monetization', title: 'Monétisation' },
   { path: 'settings/stripe-connect', title: 'Compte / Stripe Connect' },
@@ -67,17 +63,13 @@ const ARTIST_DASHBOARD_PLACEHOLDERS: { path: string; title: string }[] = [
 
 const ADMIN_PLACEHOLDERS: { path: string; title: string }[] = [
   { path: '', title: 'Overview' },
-  { path: 'artists', title: 'Artistes' },
-  { path: 'artists/:artistId', title: 'Détail artiste' },
   { path: 'users', title: 'Utilisateurs' },
   { path: 'users/:userId', title: 'Détail utilisateur' },
   { path: 'content', title: 'Contenu' },
   { path: 'transactions', title: 'Transactions' },
   { path: 'payouts', title: 'Payouts' },
-  { path: 'ads', title: 'Publicités' },
   { path: 'orders', title: 'Commandes' },
   { path: 'subscriptions', title: 'Abonnements' },
-  { path: 'moderation', title: 'Modération' },
   { path: 'settings', title: 'Paramètres plateforme' },
 ]
 
@@ -112,8 +104,11 @@ export function AppRoutes() {
         }
       >
         <Route path="/home" element={<HomePage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/artists/:slug" element={<ArtistProfilePage />} />
+        <Route path="/music" element={<MusicPage />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/shop/:productId" element={<ProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout/confirmation/:orderId" element={<OrderConfirmationPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         {FAN_PLACEHOLDERS.map((p) => (
@@ -121,6 +116,8 @@ export function AppRoutes() {
         ))}
       </Route>
 
+      {/* Artist-management screens: today this is just you, so /artist/:artistId
+          is reached from Account rather than a multi-artist switcher. */}
       <Route
         path="/artist/:artistId"
         element={

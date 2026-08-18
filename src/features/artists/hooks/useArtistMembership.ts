@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { collection, query, where, limit, onSnapshot } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuthStore } from '@/features/auth/store'
 import type { ArtistMember } from '@/types'
 
+/** Composite-ID doc (`{artistId}_{userId}`) — a direct get/listen, matching firestore.rules (get-only, no list). */
 export function useArtistMembership(artistId: string | undefined) {
   const userId = useAuthStore((s) => s.firebaseUser?.uid)
   const [membership, setMembership] = useState<ArtistMember | null>(null)
@@ -16,16 +17,9 @@ export function useArtistMembership(artistId: string | undefined) {
       return
     }
     setLoading(true)
-    const q = query(
-      collection(db, 'artistMembers'),
-      where('artistId', '==', artistId),
-      where('userId', '==', userId),
-      where('status', '==', 'active'),
-      limit(1),
-    )
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const first = snapshot.docs[0]
-      setMembership(first ? ({ id: first.id, ...first.data() } as ArtistMember) : null)
+    const unsubscribe = onSnapshot(doc(db, 'artistMembers', `${artistId}_${userId}`), (snapshot) => {
+      const data = snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as ArtistMember) : null
+      setMembership(data && data.status === 'active' ? data : null)
       setLoading(false)
     })
     return unsubscribe

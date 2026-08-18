@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react'
-import { collection, getDocs, limit, query, where } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { Artist } from '@/types'
 
+/**
+ * Single-artist app: the artist document's ID *is* its slug (see
+ * functions/scripts/seed.mjs), so this is a direct get() rather than a
+ * `where('slug', ...)` query. That's also the pragmatic fix for a real
+ * Firestore constraint — a `list` rule can't evaluate `resource.data`
+ * fields that aren't part of the query's own filters, so a query
+ * filtered on `slug` while the rule checks `status` is denied even when
+ * the document matches. A get() by ID has no such restriction.
+ */
 export function useArtistBySlug(slug: string | undefined) {
   const [artist, setArtist] = useState<Artist | null>(null)
   const [loading, setLoading] = useState(true)
@@ -12,12 +21,10 @@ export function useArtistBySlug(slug: string | undefined) {
     if (!slug) return
     let cancelled = false
     setLoading(true)
-    const q = query(collection(db, 'artists'), where('slug', '==', slug), limit(1))
-    getDocs(q)
+    getDoc(doc(db, 'artists', slug))
       .then((snapshot) => {
         if (cancelled) return
-        const first = snapshot.docs[0]
-        setArtist(first ? ({ id: first.id, ...first.data() } as Artist) : null)
+        setArtist(snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as Artist) : null)
       })
       .catch(() => !cancelled && setError('load_failed'))
       .finally(() => !cancelled && setLoading(false))

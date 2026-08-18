@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_STRIPE_PUBLISHABLE_KEY: string
   readonly VITE_APP_URL: string
   readonly VITE_USE_FIREBASE_EMULATORS?: string
+  readonly VITE_ARTIST_SLUG?: string
 }
 
 interface ImportMeta {

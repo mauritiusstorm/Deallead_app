@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { to: 'merch', labelKey: 'nav.merch' },
   { to: 'events', labelKey: 'nav.events' },
   { to: 'revenue', labelKey: 'nav.revenue' },
-  { to: 'team', labelKey: 'nav.team' },
   { to: 'settings', labelKey: 'nav.settings' },
 ] as const
 

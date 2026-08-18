@@ -4,15 +4,12 @@ import { Toaster } from '@/components/ui/Toast'
 
 const NAV_ITEMS = [
   { to: '', label: 'Overview' },
-  { to: 'artists', label: 'Artistes' },
   { to: 'users', label: 'Utilisateurs' },
   { to: 'content', label: 'Contenu' },
   { to: 'transactions', label: 'Transactions' },
   { to: 'payouts', label: 'Payouts' },
-  { to: 'ads', label: 'Publicités' },
   { to: 'orders', label: 'Commandes' },
   { to: 'subscriptions', label: 'Abonnements' },
-  { to: 'moderation', label: 'Modération' },
   { to: 'settings', label: 'Paramètres' },
 ] as const
 

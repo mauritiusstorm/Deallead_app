@@ -10,6 +10,18 @@ rules_version = '2';
 //  - subscriptions/{userId}_{artistId}
 //  - fcmTokens/{userId}_{deviceId}
 //
+// IMPORTANT — get vs list: Firestore evaluates a `list` (collection query)
+// rule differently from a `get` (single-document read). A `list` rule
+// cannot safely rely on resource.data fields the query doesn't itself
+// filter on, and helper functions that resolve a computed document path
+// (get()/exists() built from a path wildcard or another field) can fail
+// during the query's rule pre-check. Every collection below therefore
+// splits `allow get` (full membership/role logic is safe here) from
+// `allow list` (kept to simple, query-filtered field checks only — no
+// get()/exists() calls). Where a feature needs an artist team member to
+// *list* their own draft content, that needs its own query shape and
+// rule, added when that screen is actually built — not before.
+//
 // Money-moving documents (orders, subscriptions, revenueTransactions,
 // revenueSplits, payouts, ticketOrders) are written EXCLUSIVELY by Cloud
 // Functions using the Admin SDK, which bypasses these rules entirely.
@@ -26,11 +38,14 @@ function isSelf(userId) {
 }
 
 function isPlatformAdmin() {
-  return isSignedIn() && request.auth.token.platform_admin == true;
+  // A user with no custom claims has no `platform_admin` key on their
+  // token at all — dot-accessing a missing map key errors instead of
+  // returning false/null, so this must go through `.get(key, default)`.
+  return isSignedIn() && request.auth.token.get('platform_admin', false) == true;
 }
 
 function isModerator() {
-  return isSignedIn() && (request.auth.token.moderator == true || isPlatformAdmin());
+  return isSignedIn() && (request.auth.token.get('moderator', false) == true || isPlatformAdmin());
 }
 
 function membershipId(artistId) {
@@ -83,18 +98,22 @@ service cloud.firestore {
       allow create, delete: if false; // Cloud Functions only.
     }
 
-    // ── artists ──
+    // ── artists ── (app only ever fetches this by document ID — see useArtistBySlug)
     match /artists/{artistId} {
-      allow read: if resource.data.status == 'published' || isArtistMember(artistId) || isPlatformAdmin();
+      allow get: if resource.data.status == 'published' || isArtistMember(artistId) || isPlatformAdmin();
+      allow list: if false;
       allow create: if isSignedIn(); // creator becomes owner via a Cloud Function trigger.
       allow update: if hasArtistRole(artistId, ['owner', 'admin']) || isPlatformAdmin();
       allow delete: if false;
     }
 
+    // Composite-ID doc — always fetched with getDoc(artistMembers/{artistId}_{userId}),
+    // never queried (see useArtistMembership), so only `get` needs a rule.
     match /artistMembers/{membershipDocId} {
-      allow read: if isSignedIn() &&
+      allow get: if isSignedIn() &&
         (membershipDocId == membershipId(resource.data.artistId) || isPlatformAdmin() ||
          hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager']));
+      allow list: if false;
       // Invites/role changes go through a Cloud Function so tokens and
       // role-escalation can be validated server-side.
       allow write: if false;
@@ -108,13 +127,15 @@ service cloud.firestore {
 
     // ── music ──
     match /tracks/{trackId} {
-      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow get: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow list: if resource.data.status == 'published';
       allow create: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
       allow update, delete: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
     }
 
     match /albums/{albumId} {
-      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow get: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow list: if resource.data.status == 'published';
       allow create: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
       allow update, delete: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
     }
@@ -131,11 +152,15 @@ service cloud.firestore {
     }
 
     match /exclusiveContents/{contentId} {
-      allow read: if resource.data.status == 'published' &&
+      allow get: if resource.data.status == 'published' &&
         (resource.data.accessLevel == 'free' ||
          (resource.data.accessLevel == 'fan' && hasActiveSubscription(resource.data.artistId)) ||
          resource.data.accessLevel == 'purchase') || // purchase-gated media URL itself is protected via Storage rules
         isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      // Listing can only surface the free public teasers; fan/purchase-gated
+      // items require the per-document subscription check above, so they're
+      // fetched individually once referenced (e.g. from a notification deep link).
+      allow list: if resource.data.status == 'published' && resource.data.accessLevel == 'free';
       allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager', 'editor']);
     }
 
@@ -153,7 +178,8 @@ service cloud.firestore {
 
     // ── merch ──
     match /products/{productId} {
-      allow read: if resource.data.status == 'active' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow get: if resource.data.status == 'active' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow list: if resource.data.status == 'active';
       allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
 
       match /variants/{variantId} {
@@ -163,14 +189,16 @@ service cloud.firestore {
     }
 
     match /promoCodes/{codeId} {
-      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow get: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
     }
 
     // ── orders / checkout: read-only for the client, all writes are server-side ──
     match /orders/{orderId} {
-      allow read: if isSelf(resource.data.userId) ||
+      allow get: if isSelf(resource.data.userId) ||
         hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if false;
 
       match /items/{itemId} {
@@ -181,43 +209,51 @@ service cloud.firestore {
     }
 
     // ── subscriptions: read-only for the client, all writes are server-side ──
+    // Always fetched by composite ID (subscriptions/{userId}_{artistId}), never queried.
     match /subscriptions/{subscriptionId} {
-      allow read: if isSignedIn() && subscriptionId.split('_')[0] == request.auth.uid ||
+      allow get: if isSignedIn() && subscriptionId.split('_')[0] == request.auth.uid ||
         hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if false;
     }
 
     match /plans/{planId} {
-      allow read: if resource.data.active == true || isPlatformAdmin();
+      allow get: if resource.data.active == true || isPlatformAdmin();
+      allow list: if resource.data.active == true;
       allow write: if isPlatformAdmin() ||
         (resource.data.artistId != null && hasArtistRole(resource.data.artistId, ['owner', 'admin']));
     }
 
     // ── events / ticketing ──
     match /events/{eventId} {
-      allow read: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow get: if resource.data.status == 'published' || isArtistMember(resource.data.artistId) || isPlatformAdmin();
+      allow list: if resource.data.status == 'published';
       allow write: if hasArtistRole(request.resource.data.artistId, ['owner', 'admin', 'manager']);
     }
 
     match /ticketOrders/{ticketOrderId} {
-      allow read: if isSelf(resource.data.userId) ||
+      allow get: if isSelf(resource.data.userId) ||
         hasArtistRole(resource.data.artistId, ['owner', 'admin', 'manager', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if false;
     }
 
     // ── financial ledger: never writable by the client, admin-SDK only ──
     match /revenueTransactions/{transactionId} {
-      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow get: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if false;
     }
 
     match /revenueSplits/{splitId} {
-      allow read: if isPlatformAdmin(); // artists read via an aggregated Cloud Function, not raw splits.
+      allow get: if isPlatformAdmin(); // artists read via an aggregated Cloud Function, not raw splits.
+      allow list: if false;
       allow write: if false;
     }
 
     match /payouts/{payoutId} {
-      allow read: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow get: if hasArtistRole(resource.data.artistId, ['owner', 'admin', 'finance']) || isPlatformAdmin();
+      allow list: if false;
       allow write: if false;
     }
 
