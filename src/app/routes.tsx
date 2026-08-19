@@ -24,6 +24,11 @@ const AccountPage = lazy(() => import('@/features/auth/pages/AccountPage'))
 const SettingsPage = lazy(() => import('@/features/auth/pages/SettingsPage'))
 const SearchPage = lazy(() => import('@/features/search/pages/SearchPage'))
 const FanClubPage = lazy(() => import('@/features/subscriptions/pages/FanClubPage'))
+const MusicDashboardPage = lazy(() => import('@/features/music/pages/dashboard/MusicDashboardPage'))
+const NewAlbumPage = lazy(() => import('@/features/music/pages/dashboard/NewAlbumPage'))
+const NewTrackPage = lazy(() => import('@/features/music/pages/dashboard/NewTrackPage'))
+const MerchDashboardPage = lazy(() => import('@/features/merch/pages/dashboard/MerchDashboardPage'))
+const NewProductPage = lazy(() => import('@/features/merch/pages/dashboard/NewProductPage'))
 
 /** Screens deferred beyond this pass (events/ticketing, exclusive content) — routed and typed, content later. */
 const FAN_PLACEHOLDERS: { path: string; title: string }[] = [
@@ -42,15 +47,10 @@ const FAN_PLACEHOLDERS: { path: string; title: string }[] = [
 const ARTIST_DASHBOARD_PLACEHOLDERS: { path: string; title: string }[] = [
   { path: '', title: 'Aperçu' },
   { path: 'analytics', title: 'Analytics' },
-  { path: 'music', title: 'Musique' },
-  { path: 'music/tracks/new', title: 'Nouveau morceau' },
   { path: 'music/tracks/:trackId', title: 'Éditer le morceau' },
-  { path: 'music/albums/new', title: 'Nouvel album' },
   { path: 'music/albums/:albumId', title: 'Éditer l’album' },
-  { path: 'music/upload', title: 'Upload' },
   { path: 'content', title: 'Contenu' },
   { path: 'content/new', title: 'Nouveau contenu' },
-  { path: 'merch', title: 'Boutique' },
   { path: 'merch/products/:productId', title: 'Éditeur produit' },
   { path: 'merch/orders', title: 'Commandes' },
   { path: 'events', title: 'Événements' },
@@ -130,6 +130,11 @@ export function AppRoutes() {
           </RequireAuth>
         }
       >
+        <Route path="music" element={<MusicDashboardPage />} />
+        <Route path="music/tracks/new" element={<NewTrackPage />} />
+        <Route path="music/albums/new" element={<NewAlbumPage />} />
+        <Route path="merch" element={<MerchDashboardPage />} />
+        <Route path="merch/products/new" element={<NewProductPage />} />
         {ARTIST_DASHBOARD_PLACEHOLDERS.map((p) => (
           <Route key={p.path} path={p.path} element={<PagePlaceholder title={p.title} />} />
         ))}
