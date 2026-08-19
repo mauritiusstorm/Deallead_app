@@ -8,7 +8,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-noir px-6 text-center text-blanc">
       <div className="flex flex-col items-center gap-4">
-        <img src="/brand/logo-white.png" alt="DEALLEADx" className="w-64 max-w-full" />
+        <img src="/brand/logo-white.png" alt="Deallead" className="w-64 max-w-full" />
         <p className="text-xs uppercase tracking-[0.3em] text-white/60">{t('app.tagline')}</p>
       </div>
       <p className="max-w-sm text-sm text-white/60">

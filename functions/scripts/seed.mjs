@@ -78,8 +78,8 @@ async function seed() {
 
   await db.doc(`artists/${ARTIST_ID}`).set({
     slug: ARTIST_SLUG,
-    name: 'DEALLEADx',
-    nameLower: 'deallead',
+    name: 'Mike Deal',
+    nameLower: 'mike deal',
     bio: 'Artiste indépendant. Rappeur. Ambitieux. Visionnaire. Depuis mes débuts, je construis mon univers morceau après morceau, sans filtre, sans compromis — pour ceux qui suivent le vrai depuis le premier jour.',
     avatarUrl: image('deallead-avatar', 400),
     coverUrl: image('deallead-cover', 1200),
@@ -162,16 +162,16 @@ async function seed() {
   }
 
   const products = [
-    { id: 'product-hoodie', title: 'Hoodie DEALLEADx', priceCents: 6900, category: 'apparel', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 'product-tee', title: 'Tee DEALLEADx', priceCents: 3490, category: 'apparel', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 'product-cap', title: 'Casquette DEALLEADx', priceCents: 2900, category: 'accessories', sizes: [null] },
-    { id: 'product-chain', title: 'Chaîne DEALLEADx', priceCents: 4900, category: 'accessories', sizes: [null] },
+    { id: 'product-hoodie', title: 'Hoodie Deallead', priceCents: 6900, category: 'apparel', sizes: ['S', 'M', 'L', 'XL'] },
+    { id: 'product-tee', title: 'Tee Deallead', priceCents: 3490, category: 'apparel', sizes: ['S', 'M', 'L', 'XL'] },
+    { id: 'product-cap', title: 'Casquette Deallead', priceCents: 2900, category: 'accessories', sizes: [null] },
+    { id: 'product-chain', title: 'Chaîne Deallead', priceCents: 4900, category: 'accessories', sizes: [null] },
   ]
   for (const product of products) {
     await db.doc(`products/${product.id}`).set({
       artistId: ARTIST_ID,
       title: product.title,
-      description: `${product.title} — édition officielle DEALLEADx.`,
+      description: `${product.title} — édition officielle Deallead.`,
       category: product.category,
       images: [image(product.id, 800)],
       minPriceCents: product.priceCents,
