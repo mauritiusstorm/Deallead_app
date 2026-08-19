@@ -50,7 +50,7 @@ export default function AccountPage() {
         <Link to=".." aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
           <BackIcon className="size-5" />
         </Link>
-        <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Profil</span>
+        <img src="/brand/logo-white.png" alt="Profil" className="h-5 w-auto" />
         <Link to="/settings" aria-label="Réglages" className="p-1 text-white/70 hover:text-blanc">
           <MoreIcon className="size-5" />
         </Link>

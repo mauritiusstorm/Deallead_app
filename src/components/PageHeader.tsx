@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import { BackIcon, BellIcon, MenuIcon } from './icons'
 
-/** Top bar matching the app's header pattern: leading icon + centered title + trailing bell. */
+/** Top bar matching the app's header pattern: leading icon + small persistent logo + trailing bell. */
 export function PageHeader({
   title,
   back = false,
@@ -22,7 +22,11 @@ export function PageHeader({
       ) : (
         <MenuIcon className={cn('size-5', dark ? 'text-white/80' : 'text-black/70')} />
       )}
-      <h1 className={cn('font-display text-lg tracking-widest uppercase', dark && 'text-white')}>{title}</h1>
+      <img
+        src={dark ? '/brand/logo-white.png' : '/brand/logo-black.png'}
+        alt={title}
+        className="h-5 w-auto"
+      />
       <Link to="/notifications" aria-label="Notifications" className={cn('p-1', iconColor)}>
         <BellIcon className="size-5" />
       </Link>

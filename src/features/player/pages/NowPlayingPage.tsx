@@ -45,7 +45,7 @@ export default function NowPlayingPage() {
         <button onClick={() => navigate(-1)} aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
           <BackIcon className="size-5" />
         </button>
-        <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Lecteur</span>
+        <img src="/brand/logo-white.png" alt="Lecteur" className="h-5 w-auto" />
         <button aria-label="Options" className="p-1 text-white/70 hover:text-blanc">
           <MoreIcon className="size-5" />
         </button>

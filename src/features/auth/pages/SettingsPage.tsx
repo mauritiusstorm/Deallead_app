@@ -17,11 +17,12 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-dvh bg-noir px-4 pb-6 pt-4 text-blanc">
-      <header className="flex items-center gap-3">
+      <header className="flex items-center justify-between">
         <Link to=".." aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
           <BackIcon className="size-5" />
         </Link>
-        <h1 className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Réglages</h1>
+        <img src="/brand/logo-white.png" alt="Réglages" className="h-5 w-auto" />
+        <span className="size-5" aria-hidden />
       </header>
 
       <div className="mt-6 flex flex-col divide-y divide-white/10 rounded-lg border border-white/10">
