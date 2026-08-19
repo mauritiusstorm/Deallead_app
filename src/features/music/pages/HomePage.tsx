@@ -13,38 +13,51 @@ export default function HomePage() {
 
   if (artistLoading) {
     return (
-      <div className="px-4 pt-6">
-        <Skeleton className="h-64 w-full rounded-lg" />
+      <div className="min-h-dvh bg-noir px-4 pt-6">
+        <Skeleton dark className="h-64 w-full rounded-lg" />
       </div>
     )
   }
 
-  if (artistError) return <ErrorState />
+  if (artistError) {
+    return (
+      <div className="min-h-dvh bg-noir text-blanc">
+        <ErrorState dark />
+      </div>
+    )
+  }
   if (!artist) {
     return (
-      <EmptyState
-        title="Rien à afficher"
-        description="Le profil artiste n'existe pas encore. Lance le script de données de démo pour le créer."
-      />
+      <div className="min-h-dvh bg-noir text-blanc">
+        <EmptyState
+          dark
+          title="Rien à afficher"
+          description="Le profil artiste n'existe pas encore. Lance le script de données de démo pour le créer."
+        />
+      </div>
     )
   }
 
   const latestTrack = tracks[0]
 
   return (
-    <div className="pb-6">
-      <PageHeader title="Accueil" />
+    <div className="min-h-dvh bg-noir pb-6 text-blanc">
+      <PageHeader title="Accueil" dark />
 
       {latestTrack && (
         <div className="relative mt-4 aspect-[4/5] w-full overflow-hidden">
           {latestTrack.artworkUrl && (
             <img src={latestTrack.artworkUrl} alt="" className="absolute inset-0 size-full object-cover" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-blanc via-blanc/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/20 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-5">
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-black/60">Nouveau morceau</span>
-            <h2 className="font-display text-3xl leading-none tracking-wide">{latestTrack.title}</h2>
-            <Button size="sm" onClick={() => void playTrackList(tracks, artist.name, 0)}>
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">Nouveau morceau</span>
+            <h2 className="font-display text-3xl leading-none tracking-wide text-blanc">{latestTrack.title}</h2>
+            <Button
+              size="sm"
+              className="bg-blanc text-noir hover:bg-white/90"
+              onClick={() => void playTrackList(tracks, artist.name, 0)}
+            >
               Écouter
             </Button>
           </div>
@@ -53,8 +66,8 @@ export default function HomePage() {
 
       <section className="mt-6 px-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">Dernières sorties</h3>
-          <Link to="/music" className="text-xs text-black/40 hover:text-black/70">
+          <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Dernières sorties</h3>
+          <Link to="/music" className="text-xs text-white/40 hover:text-white/80">
             Voir tout
           </Link>
         </div>
@@ -62,7 +75,7 @@ export default function HomePage() {
         {tracksLoading && (
           <div className="flex flex-col gap-2">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-md" />
+              <Skeleton key={i} dark className="h-14 w-full rounded-md" />
             ))}
           </div>
         )}
@@ -77,9 +90,9 @@ export default function HomePage() {
               <button
                 key={track.id}
                 onClick={() => void playTrackList(tracks, artist.name, i)}
-                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-black/5"
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-white/10"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded bg-black/10">
+                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded bg-white/10">
                   {track.artworkUrl ? (
                     <img src={track.artworkUrl} alt="" className="size-full object-cover" />
                   ) : (
@@ -87,8 +100,8 @@ export default function HomePage() {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{track.title}</p>
-                  <p className="truncate text-xs text-black/50">{artist.name}</p>
+                  <p className="truncate text-sm text-blanc">{track.title}</p>
+                  <p className="truncate text-xs text-white/50">{artist.name}</p>
                 </div>
                 <Play />
               </button>

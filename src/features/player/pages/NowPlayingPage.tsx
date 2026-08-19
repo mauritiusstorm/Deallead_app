@@ -32,28 +32,32 @@ export default function NowPlayingPage() {
   const { isFavorite, toggle: toggleFavorite } = useFavorite(track?.id, track?.artistId)
 
   if (!track) {
-    return <EmptyState title="Rien en cours de lecture" action={<button onClick={() => navigate(-1)}>Retour</button>} />
+    return (
+      <div className="min-h-dvh bg-noir text-blanc">
+        <EmptyState dark title="Rien en cours de lecture" action={<button onClick={() => navigate(-1)}>Retour</button>} />
+      </div>
+    )
   }
 
   return (
-    <div className="flex min-h-dvh flex-col px-6 pb-10 pt-4">
+    <div className="flex min-h-dvh flex-col bg-noir px-6 pb-10 pt-4 text-blanc">
       <header className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} aria-label="Retour" className="p-1 text-black/70">
+        <button onClick={() => navigate(-1)} aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
           <BackIcon className="size-5" />
         </button>
-        <span className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">Lecteur</span>
-        <button aria-label="Options" className="p-1 text-black/70">
+        <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Lecteur</span>
+        <button aria-label="Options" className="p-1 text-white/70 hover:text-blanc">
           <MoreIcon className="size-5" />
         </button>
       </header>
 
       <div className="mt-8 flex flex-1 flex-col items-center justify-center gap-8">
-        <div className="aspect-square w-full max-w-xs overflow-hidden rounded-lg bg-black/10">
+        <div className="aspect-square w-full max-w-xs overflow-hidden rounded-lg bg-white/10">
           {track.artworkUrl && <img src={track.artworkUrl} alt="" className="size-full object-cover" />}
         </div>
         <div className="w-full max-w-xs text-center">
-          <h1 className="font-display text-2xl tracking-wide">{track.title}</h1>
-          <p className="text-sm text-black/50">{track.artistName}</p>
+          <h1 className="font-display text-2xl tracking-wide text-blanc">{track.title}</h1>
+          <p className="text-sm text-white/50">{track.artistName}</p>
         </div>
 
         <div className="w-full max-w-xs">
@@ -63,9 +67,9 @@ export default function NowPlayingPage() {
             max={duration || track.durationSeconds}
             value={currentTime}
             onChange={(e) => seek(Number(e.target.value))}
-            className="w-full accent-black"
+            className="w-full accent-white"
           />
-          <div className="mt-1 flex justify-between text-xs text-black/40">
+          <div className="mt-1 flex justify-between text-xs text-white/40">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration || track.durationSeconds)}</span>
           </div>
@@ -76,17 +80,17 @@ export default function NowPlayingPage() {
             aria-label="Aléatoire"
             aria-pressed={shuffle}
             onClick={toggleShuffle}
-            className={shuffle ? 'text-noir' : 'text-black/40'}
+            className={shuffle ? 'text-blanc' : 'text-white/40'}
           >
             <ShuffleIcon className="size-5" />
           </button>
-          <button aria-label="Précédent" onClick={previous}>
+          <button aria-label="Précédent" onClick={previous} className="text-blanc">
             <BackIcon className="size-6" />
           </button>
           <button
             aria-label={isPlaying ? 'Pause' : 'Écouter'}
             onClick={togglePlay}
-            className="flex size-16 items-center justify-center rounded-full bg-noir text-blanc"
+            className="flex size-16 items-center justify-center rounded-full bg-blanc text-noir"
           >
             {isPlaying ? (
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-7">
@@ -98,20 +102,20 @@ export default function NowPlayingPage() {
               </svg>
             )}
           </button>
-          <button aria-label="Suivant" onClick={next}>
+          <button aria-label="Suivant" onClick={next} className="text-blanc">
             <BackIcon className="size-6 rotate-180" />
           </button>
           <button
             aria-label="Répéter"
             aria-pressed={repeatMode !== 'off'}
             onClick={() => setRepeatMode(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}
-            className={repeatMode !== 'off' ? 'text-noir' : 'text-black/40'}
+            className={repeatMode !== 'off' ? 'text-blanc' : 'text-white/40'}
           >
             <RepeatIcon className="size-5" />
           </button>
         </div>
 
-        <div className="flex items-center gap-8 text-black/50">
+        <div className="flex items-center gap-8 text-white/50">
           <button
             aria-label="Favori"
             aria-pressed={isFavorite}

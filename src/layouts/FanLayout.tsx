@@ -20,7 +20,7 @@ export function FanLayout() {
       </main>
       <PlayerBar />
       <Toaster />
-      <nav className="fixed inset-x-0 bottom-0 z-50 flex justify-around border-t border-black/10 bg-white/95 py-3 safe-bottom backdrop-blur">
+      <nav className="fixed inset-x-0 bottom-0 z-50 flex justify-around border-t border-white/10 bg-noir/95 py-3 safe-bottom backdrop-blur">
         {NAV_ITEMS.map(({ to, Icon, label }) => (
           <NavLink
             key={to}
@@ -28,7 +28,7 @@ export function FanLayout() {
             end
             aria-label={label}
             className={({ isActive }) =>
-              cn('flex items-center justify-center px-4 py-1', isActive ? 'text-noir' : 'text-black/40')
+              cn('flex items-center justify-center px-4 py-1', isActive ? 'text-blanc' : 'text-white/40')
             }
           >
             <Icon className="size-6" strokeWidth={2} />

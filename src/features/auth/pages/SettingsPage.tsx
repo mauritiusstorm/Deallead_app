@@ -16,51 +16,51 @@ export default function SettingsPage() {
   const profile = useAuthStore((s) => s.profile)
 
   return (
-    <div className="px-4 pb-6 pt-4">
+    <div className="min-h-dvh bg-noir px-4 pb-6 pt-4 text-blanc">
       <header className="flex items-center gap-3">
-        <Link to=".." aria-label="Retour" className="p-1 text-black/70 hover:text-noir">
+        <Link to=".." aria-label="Retour" className="p-1 text-white/70 hover:text-blanc">
           <BackIcon className="size-5" />
         </Link>
-        <h1 className="text-xs font-medium uppercase tracking-[0.2em] text-black/50">Réglages</h1>
+        <h1 className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Réglages</h1>
       </header>
 
-      <div className="mt-6 flex flex-col divide-y divide-black/10 rounded-lg border border-black/10">
+      <div className="mt-6 flex flex-col divide-y divide-white/10 rounded-lg border border-white/10">
         {ACCOUNT_LINKS.map((link) => (
-          <Link key={link.to} to={link.to} className="flex items-center justify-between px-4 py-3 text-sm hover:bg-black/5">
+          <Link key={link.to} to={link.to} className="flex items-center justify-between px-4 py-3 text-sm hover:bg-white/10">
             {link.label}
-            <ChevronRightIcon className="size-4 text-black/30" />
+            <ChevronRightIcon className="size-4 text-white/30" />
           </Link>
         ))}
       </div>
 
-      <div className="mt-4 flex flex-col divide-y divide-black/10 rounded-lg border border-black/10">
+      <div className="mt-4 flex flex-col divide-y divide-white/10 rounded-lg border border-white/10">
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span>Compte</span>
-          <span className="text-xs text-black/40">{profile?.email}</span>
+          <span className="text-xs text-white/40">{profile?.email}</span>
         </div>
-        <Link to="/fan-club" className="flex items-center justify-between px-4 py-3 text-sm hover:bg-black/5">
+        <Link to="/fan-club" className="flex items-center justify-between px-4 py-3 text-sm hover:bg-white/10">
           Abonnement
-          <span className="text-xs uppercase text-black/40">Free</span>
+          <span className="text-xs uppercase text-white/40">Free</span>
         </Link>
-        <div className="flex items-center justify-between px-4 py-3 text-sm text-black/40">Paiements</div>
-        <div className="flex items-center justify-between px-4 py-3 text-sm text-black/40">Notifications</div>
+        <div className="flex items-center justify-between px-4 py-3 text-sm text-white/40">Paiements</div>
+        <div className="flex items-center justify-between px-4 py-3 text-sm text-white/40">Notifications</div>
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span>Langue</span>
           <select
             value={i18n.language}
             onChange={(e) => void i18n.changeLanguage(e.target.value)}
-            className="rounded-md border border-black/20 bg-transparent px-2 py-1 text-xs uppercase"
+            className="rounded-md border border-white/20 bg-transparent px-2 py-1 text-xs uppercase text-blanc"
           >
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
+            <option className="text-noir" value="fr">FR</option>
+            <option className="text-noir" value="en">EN</option>
           </select>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 text-sm text-black/40">Aide</div>
+        <div className="flex items-center justify-between px-4 py-3 text-sm text-white/40">Aide</div>
       </div>
 
       <button
         onClick={() => void signOutUser()}
-        className="mt-4 w-full rounded-lg border border-black/10 px-4 py-3 text-left text-sm text-red-400 hover:bg-black/5"
+        className="mt-4 w-full rounded-lg border border-white/10 px-4 py-3 text-left text-sm text-red-400 hover:bg-white/10"
       >
         Déconnexion
       </button>

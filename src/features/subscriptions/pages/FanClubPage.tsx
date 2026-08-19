@@ -12,39 +12,51 @@ export default function FanClubPage() {
 
   if (loading) {
     return (
-      <div className="px-4 pt-6">
-        <Skeleton className="h-40 w-full rounded-lg" />
+      <div className="min-h-dvh bg-noir px-4 pt-6">
+        <Skeleton dark className="h-40 w-full rounded-lg" />
       </div>
     )
   }
 
-  if (error) return <ErrorState />
-  if (!artist) return <EmptyState title="Artiste introuvable" />
+  if (error) {
+    return (
+      <div className="min-h-dvh bg-noir text-blanc">
+        <ErrorState dark />
+      </div>
+    )
+  }
+  if (!artist) {
+    return (
+      <div className="min-h-dvh bg-noir text-blanc">
+        <EmptyState dark title="Artiste introuvable" />
+      </div>
+    )
+  }
 
   return (
-    <div className="pb-6">
-      <PageHeader title="Fan Club" />
+    <div className="min-h-dvh bg-noir pb-6 text-blanc">
+      <PageHeader title="Fan Club" dark />
 
       <div className="relative mt-4 aspect-[16/9] w-full overflow-hidden">
         {artist.coverUrl && <img src={artist.coverUrl} alt="" className="absolute inset-0 size-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-blanc via-blanc/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/30 to-transparent" />
       </div>
 
       <div className="flex flex-col items-center gap-3 px-6 pt-6 text-center">
-        <CrownIcon className="size-8" />
-        <h1 className="font-display text-2xl tracking-wide">{artist.name} FAMILY</h1>
+        <CrownIcon className="size-8 text-blanc" />
+        <h1 className="font-display text-2xl tracking-wide text-blanc">{artist.name} FAMILY</h1>
 
-        <ul className="mt-2 flex w-full max-w-xs flex-col gap-2 text-left text-sm text-black/70">
+        <ul className="mt-2 flex w-full max-w-xs flex-col gap-2 text-left text-sm text-white/70">
           {BENEFITS.map((benefit) => (
             <li key={benefit} className="flex items-center gap-2">
-              <span className="text-noir">✓</span>
+              <span className="text-blanc">✓</span>
               {benefit}
             </li>
           ))}
         </ul>
 
         <Button
-          className="mt-4 w-full max-w-xs"
+          className="mt-4 w-full max-w-xs bg-blanc text-noir hover:bg-white/90"
           onClick={() => toast('Les abonnements arrivent bientôt.', 'default')}
         >
           Rejoindre
