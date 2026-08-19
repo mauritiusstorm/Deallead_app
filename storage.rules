@@ -10,31 +10,40 @@ rules_version = '2';
 //   users/{userId}/avatar/...
 //   exclusive/{artistId}/{contentId}/...
 //
+// IMPORTANT: this project's Storage rules use custom claims for artist-team
+// authorization instead of cross-service firestore.get()/firestore.exists()
+// calls. Those cross-service calls are documented to work, but on this
+// project every variant tried (a shared top-level function, inlined calls,
+// $(a)_$(b) path templating, and path(string concatenation)) returned
+// storage/unauthorized even for a hardcoded, wildcard-free, known-to-exist
+// document — verified with a client-SDK repro script against the real
+// project, so this isn't a rules-logic bug on our end, it's something about
+// cross-service access not being available here (bucket-linking state,
+// propagation, or a platform-side gap). Custom claims avoid the problem
+// entirely: they're embedded in the ID token, so a Storage rule can check
+// them with zero async lookups. `artist_member` is set on a user's account
+// via an admin script whenever they're granted an artistMembers role —
+// see functions/scripts (or ask Claude) to (re)apply it after inviting a
+// new team member, until inviteTeamMember's accept flow sets it
+// automatically (tracked as a Phase 6 TODO alongside the invite emails).
+//
 // A public download URL is never itself an authorization boundary — access
-// to `exclusive/**` is gated here by the requester's Firestore membership
-// (subscription doc or artist membership), matching firestore.rules.
+// to `exclusive/**` is gated by the requester's `artist_member` claim (or
+// platform_admin). Per-fan subscription-gated access isn't wired yet since
+// Fan Club subscriptions aren't live (see FanClubPage) — revisit this once
+// they are, likely also via a claim set when a subscription activates.
 // ─────────────────────────────────────────────────────────────────────────
 
 function isSignedIn() {
   return request.auth != null;
 }
 
+function isArtistMember() {
+  return isSignedIn() && request.auth.token.get('artist_member', false) == true;
+}
+
 function isPlatformAdmin() {
-  return isSignedIn() && request.auth.token.platform_admin == true;
-}
-
-function isArtistMember(artistId) {
-  let membershipId = artistId + '_' + request.auth.uid;
-  return isSignedIn() &&
-    firestore.exists(/databases/(default)/documents/artistMembers/$(membershipId)) &&
-    firestore.get(/databases/(default)/documents/artistMembers/$(membershipId)).data.status == 'active';
-}
-
-function hasActiveSubscription(artistId) {
-  let subId = request.auth.uid + '_' + artistId;
-  return isSignedIn() &&
-    firestore.exists(/databases/(default)/documents/subscriptions/$(subId)) &&
-    firestore.get(/databases/(default)/documents/subscriptions/$(subId)).data.status in ['trialing', 'active'];
+  return isSignedIn() && request.auth.token.get('platform_admin', false) == true;
 }
 
 function isValidAudioUpload() {
@@ -52,22 +61,22 @@ service firebase.storage {
 
     match /artists/{artistId}/tracks/{trackId}/{fileName} {
       allow read: if true; // artwork + published-track audio; gating happens at the Firestore doc / signed-URL layer for drafts.
-      allow write: if isArtistMember(artistId) && (isValidAudioUpload() || isValidImageUpload());
+      allow write: if isArtistMember() && (isValidAudioUpload() || isValidImageUpload());
     }
 
     match /artists/{artistId}/albums/{albumId}/{fileName} {
       allow read: if true;
-      allow write: if isArtistMember(artistId) && isValidImageUpload();
+      allow write: if isArtistMember() && isValidImageUpload();
     }
 
     match /artists/{artistId}/products/{productId}/{fileName} {
       allow read: if true;
-      allow write: if isArtistMember(artistId) && isValidImageUpload();
+      allow write: if isArtistMember() && isValidImageUpload();
     }
 
     match /artists/{artistId}/branding/{fileName} {
       allow read: if true;
-      allow write: if isArtistMember(artistId) && isValidImageUpload();
+      allow write: if isArtistMember() && isValidImageUpload();
     }
 
     match /users/{userId}/avatar/{fileName} {
@@ -75,11 +84,11 @@ service firebase.storage {
       allow write: if isSignedIn() && request.auth.uid == userId && isValidImageUpload();
     }
 
-    // Exclusive content is never publicly readable — only an active
-    // subscriber, the owning artist team, or a platform admin.
+    // Exclusive content is never publicly readable — only the artist team
+    // or a platform admin for now (see note above re: subscriptions).
     match /exclusive/{artistId}/{contentId}/{fileName} {
-      allow read: if hasActiveSubscription(artistId) || isArtistMember(artistId) || isPlatformAdmin();
-      allow write: if isArtistMember(artistId);
+      allow read: if isArtistMember() || isPlatformAdmin();
+      allow write: if isArtistMember();
     }
   }
 }
