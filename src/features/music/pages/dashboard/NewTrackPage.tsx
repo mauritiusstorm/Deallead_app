@@ -85,7 +85,7 @@ export default function NewTrackPage() {
           <label className="text-sm text-black/70">Fichier audio</label>
           <input
             type="file"
-            accept="audio/*"
+            accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a"
             required
             onChange={(e) => setAudioFile(e.target.files?.[0] ?? null)}
             className="text-sm"

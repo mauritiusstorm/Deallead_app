@@ -52,14 +52,23 @@ function membershipId(artistId) {
   return artistId + '_' + request.auth.uid;
 }
 
+// These top-level `function`s do NOT inherit the `{database}` path variable
+// bound by the `match /databases/{database}/documents` block below — a
+// `function` in the rules language has no lexical access to the match
+// block's captures, only to its own parameters. Using $(database) here
+// silently resolves to an invalid path (a compiler warning, not an error),
+// so exists()/get() never find the document and every check built on
+// these functions always evaluates false. Every project has exactly one
+// database named "(default)" unless you've deliberately created named
+// databases, so hardcoding it here is correct, not a hack.
 function isArtistMember(artistId) {
   return isSignedIn() &&
-    exists(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))) &&
-    get(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))).data.status == 'active';
+    exists(/databases/(default)/documents/artistMembers/$(membershipId(artistId))) &&
+    get(/databases/(default)/documents/artistMembers/$(membershipId(artistId))).data.status == 'active';
 }
 
 function artistRole(artistId) {
-  return get(/databases/$(database)/documents/artistMembers/$(membershipId(artistId))).data.role;
+  return get(/databases/(default)/documents/artistMembers/$(membershipId(artistId))).data.role;
 }
 
 function hasArtistRole(artistId, roles) {
@@ -69,8 +78,8 @@ function hasArtistRole(artistId, roles) {
 function hasActiveSubscription(artistId) {
   let subId = request.auth.uid + '_' + artistId;
   return isSignedIn() &&
-    exists(/databases/$(database)/documents/subscriptions/$(subId)) &&
-    get(/databases/$(database)/documents/subscriptions/$(subId)).data.status in ['trialing', 'active'];
+    exists(/databases/(default)/documents/subscriptions/$(subId)) &&
+    get(/databases/(default)/documents/subscriptions/$(subId)).data.status in ['trialing', 'active'];
 }
 
 service cloud.firestore {
