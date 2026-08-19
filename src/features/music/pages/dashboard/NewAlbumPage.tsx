@@ -22,8 +22,10 @@ export default function NewAlbumPage() {
       await createAlbum({ title: title.trim(), type, artworkFile })
       toast('Album créé.', 'success')
       navigate('..')
-    } catch {
-      toast("Échec de la création de l'album. Vérifie que Storage est bien activé.", 'error')
+    } catch (err) {
+      console.error(err)
+      const message = err instanceof Error ? err.message : String(err)
+      toast(`Échec de la création de l'album : ${message}`, 'error')
     }
   }
 

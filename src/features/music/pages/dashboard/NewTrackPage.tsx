@@ -32,8 +32,10 @@ export default function NewTrackPage() {
       })
       toast('Morceau ajouté.', 'success')
       navigate('..')
-    } catch {
-      toast('Échec de l’ajout du morceau. Vérifie que Storage est bien activé.', 'error')
+    } catch (err) {
+      console.error(err)
+      const message = err instanceof Error ? err.message : String(err)
+      toast(`Échec de l'ajout du morceau : ${message}`, 'error')
     }
   }
 

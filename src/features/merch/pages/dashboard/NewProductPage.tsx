@@ -65,8 +65,10 @@ export default function NewProductPage() {
       })
       toast('Produit ajouté.', 'success')
       navigate('..')
-    } catch {
-      toast("Échec de l'ajout du produit. Vérifie que Storage est bien activé.", 'error')
+    } catch (err) {
+      console.error(err)
+      const message = err instanceof Error ? err.message : String(err)
+      toast(`Échec de l'ajout du produit : ${message}`, 'error')
     }
   }
 
